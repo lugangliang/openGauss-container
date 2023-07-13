@@ -24,6 +24,7 @@
 
 source util.sh
 source install.sh
+source init.sh
 
 # Loads various settings that are used elsewhere in the script
 # This should be called before any other functions
@@ -224,7 +225,7 @@ function main() {
         create_install_path
         install_application
         set_envfile
-        generate_xml
+        #generate_xml
         install_main
         nohup $GAUSSHOME/bin/om_monitor -L $GAUSSLOG/cm/om_monitor &
         create_user_trust

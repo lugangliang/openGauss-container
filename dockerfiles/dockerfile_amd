@@ -1,14 +1,29 @@
-FROM centos:7.6.1810
+FROM centos:7.6.1810 as resource
 
 ENV OPENGAUSS_VERSION 5.0.0
 
 COPY openGauss-${OPENGAUSS_VERSION}-CentOS-64bit-all.tar.gz .
+
+RUN mkdir /all && tar -xf /openGauss-${OPENGAUSS_VERSION}-CentOS-64bit-all.tar.gz -C /all/
+RUN mkdir /om && tar -xf /all/openGauss-${OPENGAUSS_VERSION}-CentOS-64bit-om.tar.gz -C /om/
+
+COPY DbClusterInfo.py /om/script/gspylib/common/DbClusterInfo.py
+COPY InstallImpl.py /om/script/impl/install/InstallImpl.py
+
+RUN cd /om/ && tar -czf /all/openGauss-${OPENGAUSS_VERSION}-CentOS-64bit-om.tar.gz *
+RUN cd /all/ && tar -czf /openGauss-${OPENGAUSS_VERSION}-CentOS-64bit-all.tar.gz *
+
+FROM centos:7.6.1810
+
+ENV OPENGAUSS_VERSION 5.0.0
+
+COPY --from=resource /openGauss-${OPENGAUSS_VERSION}-CentOS-64bit-all.tar.gz .
 COPY gosu-amd64 /usr/local/bin/gosu
 COPY gs_createtrust.py .
 ENV LANG en_US.utf8
 
 RUN set -eux; \
-    yum install -y bzip2 bzip2-devel curl libaio readline-devel expect \
+    yum install -y bzip2 bzip2-devel curl libaio readline-devel expect dos2unix \
     which git python3 python3-devel openssl-devel net-tools openssh-server vim && \
     groupadd -g 70 omm;  \
     useradd -u 70 -g omm -d /home/omm omm;  \
@@ -32,10 +47,13 @@ RUN set -eux; \
 
 COPY entrypoint.sh /usr/local/bin/
 COPY entrypoint.sh /usr/local/bin/
+COPY init.sh /usr/local/bin/
 COPY install.sh /usr/local/bin/
 COPY util.sh /usr/local/bin/
 COPY generatexml.py /usr/local/bin/
+RUN dos2unix /usr/local/bin/*
 RUN chmod 755 /usr/local/bin/entrypoint.sh;ln -s /usr/local/bin/entrypoint.sh /
+RUN chmod 755 /usr/local/bin/init.sh;ln -s /usr/local/bin/init.sh /
 RUN chmod 755 /usr/local/bin/install.sh;ln -s /usr/local/bin/install.sh /
 RUN chmod 755 /usr/local/bin/util.sh;ln -s /usr/local/bin/util.sh /
 RUN chmod 755 /usr/local/bin/generatexml.py /
