@@ -206,10 +206,19 @@ function main() {
                 if [ "$(id -u)" = '0' ]; then
                         check_env_hosts
                         write_local_host
-                        /usr/sbin/sshd -D &
+                        # 适配容器重启
+                        config_sshd
+                        set_user_passwd
                         exec gosu omm "$BASH_SOURCE" "$@"
                 fi
+
                 echo "openGauss Database directory appears to contain a database; Skipping init"
+                # 适配容器重启
+                check_env_hosts
+                config_user_ssh
+                set_envfile
+                source ${ENVFILE} && cd ~/
+                create_user_trust
                 start_monitor_dead_loop
                 exit 0
         fi
