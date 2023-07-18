@@ -27,7 +27,6 @@ RUN set -eux; \
     which git python3 python3-devel openssl-devel net-tools openssh-server vim && \
     groupadd -g 70 omm;  \
     useradd -u 70 -g omm -d /home/omm omm;  \
-
     mkdir -p /opengauss && \
     chmod 700 /opengauss && \
     mv openGauss-${OPENGAUSS_VERSION}-CentOS-64bit-all.tar.gz /opengauss && \
