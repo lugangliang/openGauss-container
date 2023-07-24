@@ -23,17 +23,8 @@ function get_db_name() {
         done
         echo 'pod_names: '${pod_names[@]:0:3}
 }
+
 function get_cms_name() {
-        name=$(echo "$name" | sed 's/-[0-9]*$//')
-        cms_prefix="${name}-cms-"
-        for i in {0..2}
-        do
-                pod_names+=("${db_prefix}${i}")
-        done
-        echo 'pod_names: '${pod_names[@]:0:3}
-}
-function get_cms_name() {
-        name=$(echo "$name" | sed 's/-[0-9]*$//')
         cms_prefix="${name}-cms-"
         for i in {0..2}
         do
