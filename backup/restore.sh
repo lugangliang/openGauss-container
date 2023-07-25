@@ -44,7 +44,7 @@ function restoreGaussdb() {
 
 function cleanBackupfile() {
   \rm -rf /backup/gauss/backups/backups/${backupFile}
-  ehco "Clean up backup file in local dir /backup/gauss/backups/backups/${backupFile}. "
+  echo "Clean up backup file in local dir /backup/gauss/backups/backups/${backupFile}. "
 }
 
 function main() {
