@@ -34,8 +34,10 @@ ENV PGDATA /var/lib/opengauss/data
 
 COPY entrypoint.sh /usr/local/bin/
 COPY backup.sh  /usr/local/bin
+COPY restore.sh  /usr/local/bin
 RUN chmod 755 /usr/local/bin/entrypoint.sh;ln -s /usr/local/bin/entrypoint.sh / # backwards compat
 RUN chmod 755 /usr/local/bin/backup.sh; ln -s /usr/local/bin/backup.sh /
+RUN chmod 755 /usr/local/bin/restore.sh; ln -s /usr/local/bin/restore.sh /
 
 ENTRYPOINT ["entrypoint.sh"]
 

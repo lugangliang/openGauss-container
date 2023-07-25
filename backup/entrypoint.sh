@@ -370,8 +370,6 @@ _main() {
                 # setup data directories and permissions (when run as root)
                 docker_create_db_directories
                 if [ "$(id -u)" = '0' ]; then
-                        mkdir -p /data/GSbackup
-                        chown omm:omm /data/GSbackup
                         # then restart script as postgres user
                         exec gosu omm "$BASH_SOURCE" "$@"
                 fi
@@ -415,7 +413,13 @@ _main() {
                         echo
                 fi
         fi
-        bash /backup.sh
+
+        # perform action : backup or restore
+        if [ -z "${backupFile}" ]; then
+          bash /backup.sh
+        else
+          bash /restore.sh
+        fi
 }
 
 if ! _is_sourced; then
