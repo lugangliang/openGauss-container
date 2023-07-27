@@ -16,7 +16,8 @@ function backupInit() {
 }
 
 function cleanupBackupfile() {
-  \rm -rf /backup/gauss/backups/backups/opengaussbk_${gaussdbSlaveIp}/${backupFile}
+  \rm -rf /backup/gauss/backups/backups/opengaussbk_${gaussdbSlaveIp}
+  \rm -rf /backup/gauss/backups/wal/opengaussbk_${gaussdbSlaveIp}
   echo "Success to clean backup file. /backup/gauss/backups/backups/opengaussbk_${gaussdbSlaveIp}/${backupFile}"
 }
 
