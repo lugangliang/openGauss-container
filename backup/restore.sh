@@ -42,12 +42,17 @@ function prepareBackupFile() {
 }
 
 function restoreGaussdb() {
+
+  \cp -rf /backup/gauss/datanode/dn1/postgresql.conf /home/omm/
+
   \rm -rf /backup/gauss/datanode/dn1/*
   echo "Clean up opengauss data dir /backup/gauss/datanode/dn1/* . "
 
   gs_probackup restore  -B /backup/gauss/backups/ --instance=${BACKUP_NAME} -b FULL \
                -D /backup/gauss/datanode/dn1  -h /backup/gauss/tmp  \
                -p 5432 -j 8 -U rep1 -W asdfg.1314 -i ${BACKUP_FILE}
+
+ \mv -f /home/omm/postgresql.conf /backup/gauss/datanode/dn1/postgresql.conf
 
   echo "INFO gs_probackup restore finished. "
 }

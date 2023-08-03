@@ -5,15 +5,15 @@ array=(${log//|/})
 index=0
 for i in ${!array[@]}
 do
-  if [ ${array[i]} == $name ];then
+  if [ "${array[i]}"x == "$name"x ];then
     index=$i
-	break
+    break
   fi
 done
 status=${array[$index+4]}
-if [ $status == "Normal" ];then
-  echo 0
+if [ "$status"x == "Normal"x ];then
+  exit 0
 else
-  echo 1
+  exit -1
 fi
  
