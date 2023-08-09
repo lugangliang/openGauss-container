@@ -16,8 +16,8 @@ function backupInit() {
 }
 
 function cleanupBackupfile() {
-  \rm -rf /backup/gauss/backups/backups/opengaussbk_${gaussdbSlaveIp}
-  \rm -rf /backup/gauss/backups/wal/opengaussbk_${gaussdbSlaveIp}
+  \rm -rf /backup/gauss/backups/backups/opengaussbk_${gaussdbSlaveIp}/${backupFile}
+  \rm -rf /home/omm/*.log*
   echo "Success to clean backup file. /backup/gauss/backups/backups/opengaussbk_${gaussdbSlaveIp}/${backupFile}"
 }
 
@@ -25,13 +25,17 @@ function transferBackup() {
   sshpass -p ${remoteServerSshPassword} ssh ${sshOptions} ${remoteServerUser}@${remoteServerIp} pwd
   if [ $? != 0 ]; then
     echo "ERROR! can't not connect to remote server."
-    exit 1
+    return 0
   fi
 
   sshpass -p ${remoteServerSshPassword} ssh ${sshOptions} ${remoteServerUser}@${remoteServerIp} \
              mkdir -p /data/backups/opengaussbk_${gaussdbSlaveIp}
 
-  backupFile=`ls /backup/gauss/backups/backups/opengaussbk_${gaussdbSlaveIp}/ | grep -v conf`
+  backupFile=$(cat /home/omm/pg_probackup.log  | grep completed | awk '{print $7}')
+  export ${backupFile}
+
+  \cp -f /backup/gauss/backups/backups/opengaussbk_${gaussdbSlaveIp}/pg_probackup.conf \
+      /backup/gauss/backups/backups/opengaussbk_${gaussdbSlaveIp}/${backupFile}/pg_probackup.conf
 
   sshpass -p ${remoteServerSshPassword} scp -rq   ${sshOptions} \
             /backup/gauss/backups/backups/opengaussbk_${gaussdbSlaveIp}/${backupFile} \
@@ -41,7 +45,7 @@ function transferBackup() {
       echo "Success send backup file ${backupFile} to remote backup server. "
   else
       echo "Error, failed send backup file ${backupFile} to remote backup server."
-      exit 1
+      return 0
   fi
 
 }
@@ -51,7 +55,8 @@ function backupGaussdb() {
   gs_probackup add-instance -B /backup/gauss/backups -D /backup/gauss/datanode/dn1 --instance=opengaussbk_${gaussdbSlaveIp}
 
   gs_probackup backup -B /backup/gauss/backups --instance=opengaussbk_${gaussdbSlaveIp} -b FULL \
-               -U ${backupUser} -W ${backupPassword} -h /backup/gauss/tmp  -d postgres -p 5432
+               -U ${backupUser} -W ${backupPassword} -h /backup/gauss/tmp  -d postgres -p 5432 \
+               --log-directory=/home/omm/ --log-level-file=info
 }
 
 function startGaussdb() {
